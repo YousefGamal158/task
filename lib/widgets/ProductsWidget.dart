@@ -18,12 +18,13 @@ class ProductsWidget extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         return Container(
+          padding: EdgeInsets.all(5),
           margin: EdgeInsets.symmetric(horizontal: 5),
-          padding: EdgeInsets.symmetric(horizontal: 5),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),border:Border.all(width: 2,color: Color(0XFF014086))),
 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CachedNetworkImage(
                 imageUrl: productsList?[index].images?[0] ?? '',
