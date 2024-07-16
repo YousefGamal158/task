@@ -17,7 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   var viewModel = getIt.get<ProductsViewModel>();
   @override
   void initState() {
-
     super.initState();
     viewModel.loadSources();
   }
@@ -27,39 +26,68 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          'route'
-        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('Route',style: TextStyle(
+          color: Color(0XFF014086),fontSize: 26
+        )),
       ),
       body: Column(
         children: [
-          BlocBuilder<ProductsViewModel,ProductState>(bloc: viewModel,builder: (context, state) {
-            switch(state){
-              case SuccessState() : {
-                var productsList = state.productsList;
-                return ProductsWidget(productsList);
-              }
-              case LoadingState() : {
-                  return  Center(child: Column(
-                    children: [
-                      Text(state.message),
-                      CircularProgressIndicator()
-                    ],
-                  ),);
-              }
-              case ErrorState() : {
+          Row(
+
+            children: [
+              Container(
+
+
+                margin: EdgeInsets.all(5),
+                width: MediaQuery.of(context).size.width*0.9,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(width: 2, color: Color(0XFF014086))),
+                child: Row(
+
+                  children: [
+                    Icon(Icons.search,color: Color(0XFF014086),),
+                    Text('What do Search For ?'),
+                  ],
+                ),
+              ),
+              Icon(Icons.shopping_cart_outlined,size: 30,color: Color(0XFF014086),)
+              
+            ],
+          ),
+          BlocBuilder<ProductsViewModel, ProductState>(
+              bloc: viewModel,
+              builder: (context, state) {
+                switch (state) {
+                  case SuccessState():
+                    {
+                      var productsList = state.productsList;
+                      return ProductsWidget(productsList);
+                    }
+                  case LoadingState():
+                    {
                       return Center(
                         child: Column(
                           children: [
-                            Text(state.errorMessage)
+                            Text(state.message),
+                            CircularProgressIndicator()
                           ],
                         ),
                       );
-              }
-            }
-
-          })
+                    }
+                  case ErrorState():
+                    {
+                      return Center(
+                        child: Column(
+                          children: [Text(state.errorMessage)],
+                        ),
+                      );
+                    }
+                }
+              })
           // FutureBuilder(future:apiManger.getProducts(), builder:(context, snapshot) {
           //   return ProductsWidget(snapshot);
           // },)
