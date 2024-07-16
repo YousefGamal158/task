@@ -2,10 +2,11 @@ import 'dart:convert';
 
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:task/api/ProductsResponse.dart';
 
 import '../api/Products.dart';
-
+@singleton
 class ApiManger {
   static const String baseUrl = 'dummyjson.com';
   Future<ProductsResponse> getProducts() async {

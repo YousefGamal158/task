@@ -1,6 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task/apiManger/ApiManger.dart';
+import 'package:task/domain/di/di.dart';
+import 'package:task/products/ProductsViewModel.dart';
+import 'package:task/widgets/ProductsWidget.dart';
 
 import '../api/Products.dart';
 
@@ -10,58 +14,83 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Products products = Products();
-  ApiManger apiManger =
-      ApiManger();
+  var viewModel = getIt.get<ProductsViewModel>();
+  @override
+  void initState() {
+    super.initState();
+    viewModel.loadSources();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          'route'
-        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('Route',style: TextStyle(
+          color: Color(0XFF014086),fontSize: 26
+        )),
       ),
       body: Column(
         children: [
-          FutureBuilder(future:apiManger.getProducts(), builder:(context, snapshot) {
-            return Expanded(
-              child:GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:2,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 15,
+          Row(
+
+            children: [
+              Container(
 
 
-              ), itemBuilder: (context, index) {
-                return Container(
-                  margin: EdgeInsets.all(2),
-                  padding: EdgeInsets.symmetric(horizontal: 5,vertical: 1),
-                  decoration: BoxDecoration(border:Border.all(width: 2.5,color: Colors.blue )),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CachedNetworkImage(imageUrl: snapshot.data?.products?[index].images?[0]??'',width: 180,height: 110,),
-                      Text(snapshot.data?.products?[index].title??""),
-                      Text('Price : ${snapshot.data?.products?[index].price??0}'),
-                      Row(
-                        children: [
-                          Text('Rating : ${snapshot.data?.products?[index].rating}',style: TextStyle(
-                            fontSize: 14
-                          ),),
-                        Icon(Icons.star,color: Colors.amber,)
-                        ],
-                      ),
+                margin: EdgeInsets.all(5),
+                width: MediaQuery.of(context).size.width*0.9,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(width: 2, color: Color(0XFF014086))),
+                child: Row(
 
-
-                    ],
-                  ),
-                );
-              },itemCount: snapshot.data?.products?.length,)
-
-            );
-          },)
+                  children: [
+                    Icon(Icons.search,color: Color(0XFF014086),),
+                    Text('What do Search For ?'),
+                  ],
+                ),
+              ),
+              Icon(Icons.shopping_cart_outlined,size: 30,color: Color(0XFF014086),)
+              
+            ],
+          ),
+          BlocBuilder<ProductsViewModel, ProductState>(
+              bloc: viewModel,
+              builder: (context, state) {
+                switch (state) {
+                  case SuccessState():
+                    {
+                      var productsList = state.productsList;
+                      return ProductsWidget(productsList);
+                    }
+                  case LoadingState():
+                    {
+                      return Center(
+                        child: Column(
+                          children: [
+                            Text(state.message),
+                            CircularProgressIndicator()
+                          ],
+                        ),
+                      );
+                    }
+                  case ErrorState():
+                    {
+                      return Center(
+                        child: Column(
+                          children: [Text(state.errorMessage)],
+                        ),
+                      );
+                    }
+                }
+              })
+          // FutureBuilder(future:apiManger.getProducts(), builder:(context, snapshot) {
+          //   return ProductsWidget(snapshot);
+          // },)
         ],
       ),
     );
